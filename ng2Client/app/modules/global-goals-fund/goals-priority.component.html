@@ -1,0 +1,52 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <h3>
+            Goals Priority
+        </h3>
+        <hr />
+        <a routerLink="/app/global-goals">Global Goals</a> /
+        <a routerLink="/app/additional-goals">Additional Goals</a> /
+        Goals Priority /
+        <a routerLink="/app/sponsors">Sponsors</a> /
+        <a routerLink="/app/dashboard">Dashboard</a>
+        <hr />
+        <p>
+            Since we have multiple categories, here you can set the importance of each category. More important means more resources for that category.
+        </p>
+        <hr />
+        <div class="row" *ngIf="projectElement">
+            <div class="col-md-6" *ngFor="let field of projectElement.elementFieldIndexSet()">
+                <div class="row goalsRow">
+                    <div class="col-md-4 text-center g-mt-20">
+                        <strong>
+                            {{ field.Name }}
+                        </strong>
+                    </div>
+                    <div class="col-md-8 text-center g-mt-20">
+                        <button type="button" (click)="updateRating(field, 0)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': field.indexRating() < 0, 'fa-heart': field.indexRating() >= 0 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(field, 25)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': field.indexRating() < 25, 'fa-heart': field.indexRating() >= 25 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(field, 50)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': field.indexRating() < 50, 'fa-heart': field.indexRating() >= 50 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(field, 75)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': field.indexRating() < 75, 'fa-heart': field.indexRating() >= 75 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(field, 100)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': field.indexRating() < 100, 'fa-heart': field.indexRating() === 100 }"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="text-center">
+            <button (click)="navigateToSponsors()" class="btn btn-lg btn-default">
+                Save &amp; Next <i class="fa fa-lg fa-caret-right"></i>
+            </button>
+        </div>
+    </div>
+</div>

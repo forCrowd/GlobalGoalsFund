@@ -1,0 +1,12 @@
+﻿.fa-heart, .fa-heart-o {
+    color: #E5233D;
+}
+
+.goalsRow {
+    min-height: 100px;
+}
+
+.goalImage {
+    height: 150px;
+    width: 150px;
+}

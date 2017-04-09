@@ -1,0 +1,49 @@
+## General rules
+
+# Build folders
+[Bb]in/
+[Oo]bj/
+
+# Chutzpah (necessary?)
+_Chutzpah.*
+
+# NPM packages
+npm-debug.log
+node_modules
+
+# NuGet packages
+packages
+
+# Publish profiles
+*.pubxml
+
+# User-specific files
+*.suo
+*.user
+
+# Visual Studio
+.vs/
+
+# Others
+~$*
+Thumbs.db
+
+## Project specific rules
+
+# ng2Client
+
+ng2Client/app/**/*.js
+ng2Client/app/**/*.map
+
+ng2Client/app/css/app.min.css
+ng2Client/app/fonts
+
+# ng2Client - lib: Contains fixed versions of external .js files (breeze.odata etc.)
+!ng2Client/app/lib/*.js
+
+ng2Client/app/settings/local*
+ng2Client/app/settings/test*
+ng2Client/app/settings/production*
+
+ng2Client/aot
+ng2Client/publish

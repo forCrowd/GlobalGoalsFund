@@ -1,0 +1,53 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <h3>
+            Global Goals
+        </h3>
+        <hr />
+        Global Goals /
+        <a routerLink="/app/additional-goals">Additional Goals</a> /
+        <a routerLink="/app/goals-priority">Goals Priority</a> /
+        <a routerLink="/app/sponsors">Sponsors</a> /
+        <a routerLink="/app/dashboard">Dashboard</a>
+        <hr />
+        <p>
+            Please choose which goals are important for you, which goals we should focus first and solve.
+        </p>
+        <hr />
+        <div class="row" *ngIf="globalGoalElement">
+            <div class="col-md-6" *ngFor="let item of globalGoalElement.getElementItemSet('name')">
+                <div class="row goalsRow">
+                    <div class="col-md-4 text-center g-mt-20">
+                        <img [src]="item.elementCell('Image').StringValue" class="goalImage" />
+                    </div>
+                    <div class="col-md-8 text-center g-mt-20">
+                        <p>
+                            {{ item.elementCell('Description').StringValue }}
+                        </p>
+                        <button type="button" (click)="updateRating(item.elementCell('Global Goal Rating'), 0)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': item.elementCell('Global Goal Rating').numericValue() < 0, 'fa-heart': item.elementCell('Global Goal Rating').numericValue() >= 0 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(item.elementCell('Global Goal Rating'), 25)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': item.elementCell('Global Goal Rating').numericValue() < 25, 'fa-heart': item.elementCell('Global Goal Rating').numericValue() >= 25 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(item.elementCell('Global Goal Rating'), 50)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': item.elementCell('Global Goal Rating').numericValue() < 50, 'fa-heart': item.elementCell('Global Goal Rating').numericValue() >= 50 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(item.elementCell('Global Goal Rating'), 75)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': item.elementCell('Global Goal Rating').numericValue() < 75, 'fa-heart': item.elementCell('Global Goal Rating').numericValue() >= 75 }"></i>
+                        </button>
+                        <button type="button" (click)="updateRating(item.elementCell('Global Goal Rating'), 100)" class="btn btn-link">
+                            <i class="fa fa-lg" aria-hidden="true" [ngClass]="{ 'fa-heart-o': item.elementCell('Global Goal Rating').numericValue() < 100, 'fa-heart': item.elementCell('Global Goal Rating').numericValue() === 100 }"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="text-center">
+            <button (click)="navigateToAdditionalGoals()" class="btn btn-lg btn-default">
+                Save &amp; Next <i class="fa fa-lg fa-caret-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
