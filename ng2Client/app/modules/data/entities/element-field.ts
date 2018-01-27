@@ -86,8 +86,8 @@ export class ElementField extends EntityBase {
             //cell.setIndexIncome();
         }
     }
-    IndexCalculationType: number = 0;
-    IndexSortType: number = 0;
+    IndexCalculationType: number = 2;
+    IndexSortType: number = 1;
     SortOrder: number = 0;
     IndexRatingTotal: number = 0; // Computed value - Used in: setOtherUsersIndexRatingTotal
     IndexRatingCount: number = 0; // Computed value - Used in: setOtherUsersIndexRatingCount

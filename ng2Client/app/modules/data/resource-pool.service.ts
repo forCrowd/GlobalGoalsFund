@@ -355,7 +355,7 @@ export class ResourcePoolService {
 
         // Is authorized? No, then get only the public data, yes, then get include user's own records
         if (this.dataService.currentUser.isAuthenticated()) {
-            query = query.expand("User, UserResourcePoolSet, ElementSet.ElementFieldSet.UserElementFieldSet, ElementSet.ElementItemSet.ElementCellSet.UserElementCellSet");
+            query = query.expand("User, ElementSet.ElementFieldSet.UserElementFieldSet, ElementSet.ElementItemSet.ElementCellSet.UserElementCellSet");
         } else {
             query = query.expand("User, ElementSet.ElementFieldSet, ElementSet.ElementItemSet.ElementCellSet");
         }
@@ -607,36 +607,5 @@ export class ResourcePoolService {
     }
 
     updateResourcePoolRate(resourcePool: any, updateType: any) {
-
-        switch (updateType) {
-            case "increase":
-            case "decrease": {
-
-                var userResourcePool = resourcePool.currentUserResourcePool();
-
-                // If there is no item, create it
-                if (userResourcePool === null) {
-
-                    var resourcePoolRate = updateType === "increase" ? 15 : 5;
-                    this.createUserResourcePool(resourcePool, resourcePoolRate);
-
-                } else { // If there is an item, update Rating, but cannot be smaller than zero and cannot be bigger than 1000
-
-                    userResourcePool.ResourcePoolRate = updateType === "increase" ?
-                        userResourcePool.ResourcePoolRate + 5 > 1000 ? 1000 : userResourcePool.ResourcePoolRate + 5 :
-                        userResourcePool.ResourcePoolRate - 5 < 0 ? 0 : userResourcePool.ResourcePoolRate - 5;
-
-                    // Update the cache
-                    resourcePool.setCurrentUserResourcePoolRate();
-                }
-
-                break;
-            }
-            case "reset": {
-
-                resourcePool.removeUserResourcePool();
-                break;
-            }
-        }
     }
 }

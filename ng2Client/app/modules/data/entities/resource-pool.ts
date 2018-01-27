@@ -33,23 +33,13 @@ export class ResourcePool extends EntityBase {
             this.fields.key = newValue;
         }
     }
-    get UseFixedResourcePoolRate(): number {
-        return this.fields.useFixedResourcePoolRate;
-    }
-    set UseFixedResourcePoolRate(value: number) {
-        if (this.fields.useFixedResourcePoolRate !== value) {
-            this.fields.useFixedResourcePoolRate = value;
-
-            this.setResourcePoolRate();
-        }
-    }
+    UseFixedResourcePoolRate = true;
     InitialValue: number = 0;
     ResourcePoolRateTotal: number = 0; // Computed value - Used in: setOtherUsersResourcePoolRateTotal
     ResourcePoolRateCount: number = 0; // Computed value - Used in: setOtherUsersResourcePoolRateCount
     RatingCount: number = 0; // Computed value - Used in: resource-pool-editor.html
     User: any;
     ElementSet: any[];
-    UserResourcePoolSet: any[];
 
     // TODO Move this to field.js?
     displayMultiplierFunctions = true; // In some cases, it's not necessary for the user to change multiplier
@@ -110,7 +100,6 @@ export class ResourcePool extends EntityBase {
         resourcePoolRate: any,
         resourcePoolRatePercentage: any,
         selectedElement: any,
-        useFixedResourcePoolRate: any
     } = {
         currentUserResourcePoolRate: null,
         isAdded: false,
@@ -122,7 +111,6 @@ export class ResourcePool extends EntityBase {
         resourcePoolRate: null,
         resourcePoolRatePercentage: null,
         selectedElement: null,
-        useFixedResourcePoolRate: false
     };
 
     _init(setComputedFields: any) {
@@ -132,16 +120,6 @@ export class ResourcePool extends EntityBase {
         if (setComputedFields) {
 
             var userRatings: any[] = [];
-
-            // ResourcePool
-            this.UserResourcePoolSet.forEach((userResourcePool: any) => {
-                this.ResourcePoolRateTotal += userResourcePool.ResourcePoolRate;
-                this.ResourcePoolRateCount += 1;
-
-                if (userRatings.indexOf(userResourcePool.UserId) === -1) {
-                    userRatings.push(userResourcePool.UserId);
-                }
-            });
 
             // Fields
             this.ElementSet.forEach((element: any) => {
@@ -207,10 +185,8 @@ export class ResourcePool extends EntityBase {
         this.updateCache();
     }
 
-    currentUserResourcePool() {
-        return this.UserResourcePoolSet.length > 0 ?
-            this.UserResourcePoolSet[0] :
-            null;
+    currentUserResourcePool(): any {
+        return null;
     }
 
     currentUserResourcePoolRate() {
@@ -299,15 +275,6 @@ export class ResourcePool extends EntityBase {
     }
 
     removeUserResourcePool() {
-
-        var currentUserResourcePool = this.currentUserResourcePool();
-
-        if (currentUserResourcePool !== null) {
-            currentUserResourcePool.entityAspect.setDeleted();
-
-            // Update the cache
-            this.setCurrentUserResourcePoolRate();
-        }
     }
 
     resourcePoolRate() {

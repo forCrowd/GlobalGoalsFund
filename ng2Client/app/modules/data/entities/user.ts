@@ -37,7 +37,6 @@ export class User extends EntityBase {
     Logins: any[];
     Roles: any[];
     ResourcePoolSet: any[];
-    UserResourcePoolSet: any[];
     UserElementFieldSet: any[];
     UserElementCellSet: any[];
 
