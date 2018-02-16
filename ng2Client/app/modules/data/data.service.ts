@@ -17,27 +17,11 @@ export class DataService {
     saveChangesCompleted$: EventEmitter<void> = new EventEmitter<void>();
 
     // Service urls
-    addPasswordUrl: string = "";
-    changeEmailUrl: string = "";
-    changePasswordUrl: string = "";
-    changeUserNameUrl: string = "";
-    confirmEmailUrl: string = "";
-    externalLoginUrl: string = "";
     registerUrl: string = "";
-    resendConfirmationEmailUrl: string = "";
-    resetPasswordUrl: string = "";
-    resetPasswordRequestUrl: string = "";
     tokenUrl: string = "";
-    webApiInfoUrl: string = "";
 
     currentUser: User = null;
     fetchedUsers: string[] = [];
-    get loginReturnUrl(): string {
-        return localStorage.getItem("loginReturnUrl");
-    };
-    set loginReturnUrl(value: string) {
-        localStorage.setItem("loginReturnUrl", value);
-    }
     restrictUserNames = ["app", "app.html", "app_offline.htm", "favicon.ico", "robots.txt", "web.config"]; // User cannot choose one of these folder/file names as its own username
     saveTimer: any = null;
 
@@ -46,116 +30,8 @@ export class DataService {
         private logger: Logger) {
 
         // Service urls
-        this.addPasswordUrl = Settings.serviceAppUrl + "/api/Account/AddPassword";
-        this.changeEmailUrl = Settings.serviceAppUrl + "/api/Account/ChangeEmail";
-        this.changePasswordUrl = Settings.serviceAppUrl + "/api/Account/ChangePassword";
-        this.changeUserNameUrl = Settings.serviceAppUrl + "/api/Account/ChangeUserName";
-        this.confirmEmailUrl = Settings.serviceAppUrl + "/api/Account/ConfirmEmail";
-        this.externalLoginUrl = Settings.serviceAppUrl + "/api/Account/ExternalLogin";
-        this.registerUrl = Settings.serviceAppUrl + "/api/Account/Register";
-        this.resendConfirmationEmailUrl = Settings.serviceAppUrl + "/api/Account/ResendConfirmationEmail";
-        this.resetPasswordUrl = Settings.serviceAppUrl + "/api/Account/ResetPassword";
-        this.resetPasswordRequestUrl = Settings.serviceAppUrl + "/api/Account/ResetPasswordRequest";
-        this.tokenUrl = Settings.serviceAppUrl + "/api/Token";
-        this.webApiInfoUrl = Settings.serviceAppUrl + "/api/WebApi/WebApiInfo";
-    }
-
-    addPassword(addPasswordBindingModel: any) {
-        return this.http.post(this.addPasswordUrl, addPasswordBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                this.currentUser.HasPassword = null;
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
-    changeEmail(changeEmailBindingModel: any): Observable<any> {
-
-        changeEmailBindingModel.ClientAppUrl = window.location.origin;
-
-        return this.http.post(this.changeEmailUrl, changeEmailBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                this.currentUser.Email = updatedUser.Email;
-                this.currentUser.EmailConfirmed = false;
-                this.currentUser.IsAnonymous = false;
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
-    changePassword(changePasswordBindingModel: any) {
-        return this.http.post(this.changePasswordUrl, changePasswordBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
-    changeUserName(changeUserNameBindingModel: any) {
-
-        return this.http.post(this.changeUserNameUrl, changeUserNameBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                // Update fetchedUsers list
-                this.fetchedUsers.splice(this.fetchedUsers.indexOf(this.currentUser.UserName));
-                this.fetchedUsers.push(updatedUser.UserName);
-
-                // Update username
-                this.currentUser.UserName = updatedUser.UserName;
-
-                // Update token as well
-                let tokenItem = localStorage.getItem("token");
-                let token = tokenItem ? JSON.parse(tokenItem.toString()) : null;
-                // Todo How about token === null case?
-                token.userName = updatedUser.UserName;
-                localStorage.setItem("token", JSON.stringify(token));
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
-    confirmEmail(confirmEmailBindingModel: any) {
-        return this.http.post(this.confirmEmailUrl, confirmEmailBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                this.currentUser.EmailConfirmed = true;
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-
-                return "";
-            })
-            .catch((error: any) => this.handleError(error));
+        this.registerUrl = Settings.serviceAppUrl + "/api/v1/Account/Register";
+        this.tokenUrl = Settings.serviceAppUrl + "/api/v1/Token";
     }
 
     createEntity(entityType: any, initialValues: any, entityState?: any, mergeStrategy?: any) {
@@ -172,10 +48,6 @@ export class DataService {
             .catch((error: any) => this.handleError(error));
 
         return observable;
-    }
-
-    fetchEntityByKey(typeName: any, keyValues: any, checkLocalCacheFirst: any) {
-        return this.entityManager.fetchEntityByKey(typeName, keyValues, checkLocalCacheFirst);
     }
 
     getChanges(entityTypeName?: any, entityState?: any) {
@@ -197,20 +69,8 @@ export class DataService {
         // return this.entityManager.getChanges();
     }
 
-    getEntities(entityTypes: any, entityStates: any) {
-        return this.entityManager.getEntities(entityTypes, entityStates);
-    }
-
     getEntityByKey(entityType: any, entityKey: any) {
         return this.entityManager.getEntityByKey(entityType, entityKey);
-    }
-
-    getExternalLoginUrl(provider: string) {
-        let url = this.externalLoginUrl
-            + "?provider="
-            + provider + "&clientReturnUrl="
-            + window.location.origin + "/app/account/login";
-        return url;
     }
 
     getUser(username: string) {
@@ -220,7 +80,7 @@ export class DataService {
 
         let query = EntityQuery
             .from("Users")
-            .expand("ResourcePoolSet")
+            .expand("ProjectSet")
             .where("UserName", "eq", username);
 
         // From server or local?
@@ -249,14 +109,6 @@ export class DataService {
             });
     }
 
-    getWebApiInfo(): any {
-        return this.http.get(this.webApiInfoUrl)
-            .map((response: Response): any => {
-                return this.extractData(response);
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
     hasChanges() {
         return this.getChanges().length > 0;
         //return this.entityManager.hasChanges();
@@ -270,17 +122,6 @@ export class DataService {
             });
     }
 
-    login(username: any, password: any, rememberMe: any, singleUseToken?: any): Observable<void> {
-
-        return this.getToken(username, password, rememberMe, singleUseToken)
-            .mergeMap((): Observable<void> => {
-
-                this.resetCurrentUser(false);
-
-                return this.setCurrentUser();
-            });
-    }
-
     logout(): Observable<void> {
 
         this.resetCurrentUser(true);
@@ -288,84 +129,8 @@ export class DataService {
         return this.setCurrentUser();
     }
 
-    register(registerBindingModel: any, rememberMe: any): Observable<Object> {
-
-        // Validate: Don't allow to set a username that is in "restrict usernames" list
-        var username = registerBindingModel.UserName.toLowerCase();
-        var restrictUsername = this.restrictUserNames.indexOf(username) > -1;
-
-        if (restrictUsername) {
-            this.logger.logError("Username is already taken", null, true);
-            return Observable.throw({ alreadyHandled: true });
-        }
-
-        registerBindingModel.ClientAppUrl = window.location.origin;
-
-        return this.http.post(this.registerUrl, registerBindingModel, rememberMe)
-            .mergeMap((value: Response): any => {
-
-                let updatedUser = this.extractData(value);
-
-                // Update fetchedUsers list
-                this.fetchedUsers.splice(this.fetchedUsers.indexOf(this.currentUser.UserName));
-                this.fetchedUsers.push(updatedUser.UserName);
-
-                // breeze context user entity fix-up!
-                // TODO Try to make this part better, use OData method?
-                this.currentUser.Id = updatedUser.Id;
-                this.currentUser.UserName = updatedUser.UserName;
-                this.currentUser.Email = updatedUser.Email;
-                this.currentUser.IsAnonymous = updatedUser.IsAnonymous;
-                this.currentUser.HasPassword = updatedUser.HasPassword;
-                this.currentUser.SingleUseToken = updatedUser.SingleUseToken;
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-
-                return this.getToken(registerBindingModel.UserName, registerBindingModel.Password, rememberMe)
-                    .mergeMap((): any => {
-
-                        // Save the changes that's been done before the registration
-                        return this.saveChanges();
-                    });
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
     rejectChanges() {
         this.entityManager.rejectChanges();
-    }
-
-    resendConfirmationEmail() {
-
-        const model = { ClientAppUrl: window.location.origin };
-
-        return this.http.post(this.resendConfirmationEmailUrl, model)
-            .catch((error: any) => this.handleError(error));
-    }
-
-    resetPassword(resetPasswordBindingModel: any) {
-        return this.http.post(this.resetPasswordUrl, resetPasswordBindingModel)
-            .map((value: Response) => {
-
-                let updatedUser = this.extractData(value);
-
-                // Sync RowVersion fields
-                this.syncRowVersion(this.currentUser, updatedUser);
-
-                this.currentUser.entityAspect.acceptChanges();
-            })
-            .catch((error: any) => this.handleError(error));
-    }
-
-    resetPasswordRequest(resetPasswordRequestBindingModel: any) {
-
-        resetPasswordRequestBindingModel.ClientAppUrl = window.location.origin;
-
-        return this.http.post(this.resetPasswordRequestUrl, resetPasswordRequestBindingModel)
-            .catch((error: any) => this.handleError(error));
     }
 
     saveChanges(): Observable<Object> {
@@ -588,11 +353,9 @@ export class DataService {
         batches.push(this.getChanges("UserElementField", EntityState.Deleted));
         batches.push(this.getChanges("ElementField", EntityState.Deleted));
         batches.push(this.getChanges("Element", EntityState.Deleted));
-        batches.push(this.getChanges("UserResourcePool", EntityState.Deleted));
         batches.push(this.getChanges("ResourcePool", EntityState.Deleted));
 
         batches.push(this.getChanges("ResourcePool", EntityState.Added));
-        batches.push(this.getChanges("UserResourcePool", EntityState.Added));
         batches.push(this.getChanges("Element", EntityState.Added));
         batches.push(this.getChanges("ElementField", EntityState.Added));
         batches.push(this.getChanges("UserElementField", EntityState.Added));
@@ -672,7 +435,7 @@ export class DataService {
             var username = token.userName;
             var query = EntityQuery
                 .from("Users")
-                .expand("ResourcePoolSet")
+                .expand("ProjectSet")
                 .where("UserName", "eq", username)
                 .using(FetchStrategy.FromServer);
 

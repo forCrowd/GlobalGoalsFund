@@ -6,110 +6,23 @@ import { ElementFieldDataType } from "./enums";
 export class ElementField extends EntityBase {
 
     // Server-side
-    Id: number = 0;
-    ElementId: number = 0;
-    Name: string = "";
-    get DataType(): any {
-        return this.fields.dataType;
-    }
-    set DataType(value: any) {
-        if (this.fields.dataType !== value) {
-            this.fields.dataType = value;
-
-            if (this.initialized) {
-
-                // a. UseFixedValue must be null for String & Element types
-                if (value === ElementFieldDataType.String ||
-                    value === ElementFieldDataType.Element) {
-                    this.UseFixedValue = null;
-                }
-
-                // b. UseFixedValue must be "false" for DirectIncome & Multiplier types
-                if (value === ElementFieldDataType.Multiplier) {
-                    this.UseFixedValue = false;
-                }
-
-                // c. UseFixedValue must be "true" for DirectIncome
-                if (value === ElementFieldDataType.DirectIncome) {
-                    this.UseFixedValue = true;
-                }
-
-                // d. IndexEnabled must be "false" for String, Element & Multipler types
-                if (value === ElementFieldDataType.String
-                    || ElementFieldDataType.Element
-                    || ElementFieldDataType.Multiplier) {
-                    this.IndexEnabled = false;
-                }
-
-                // Event
-                this.dataTypeChanged$.emit(this);
-            }
-        }
-    }
+    Id = 0;
+    ElementId = 0;
+    Name = "";
+    DataType = 0;
     SelectedElementId: any = null;
     UseFixedValue: boolean = null;
-    get IndexEnabled(): boolean {
-        return this.fields.indexEnabled;
-    }
-    set IndexEnabled(value: boolean) {
-        if (this.fields.indexEnabled !== value) {
-            this.fields.indexEnabled = value;
-
-            if (this.initialized) {
-                this.IndexCalculationType = value ? 1 : 0;
-                this.IndexSortType = value ? 1 : 0;
-
-                this.indexEnabledChanged$.emit(this);
-            }
-
-            // TODO Complete this block!
-
-            //// Update related
-            //// a. Element
-            //this.Element.setElementFieldIndexSet();
-
-            //// b. Item(s)
-            //this.ElementCellSet.forEach(function(cell) {
-            //    var item = cell.ElementItem;
-            //    item.setElementCellIndexSet();
-            //});
-
-            //// c. Cells
-            //this.ElementCellSet.forEach(function(cell) {
-            //    cell.setNumericValueMultipliedPercentage(false);
-            //});
-            //this.setReferenceRatingMultiplied();
-
-            /* IndexEnabled related functions */
-            //cell.setAggressiveRating();
-            //cell.setratingPercentage();
-            //cell.setIndexIncome();
-        }
-    }
-    IndexCalculationType: number = 2;
-    IndexSortType: number = 1;
-    SortOrder: number = 0;
-    IndexRatingTotal: number = 0; // Computed value - Used in: setOtherUsersIndexRatingTotal
-    IndexRatingCount: number = 0; // Computed value - Used in: setOtherUsersIndexRatingCount
+    RatingEnabled = false;
+    IndexSortType = 1;
+    SortOrder = 0;
+    RatingTotal = 0; // Computed value - Used in: setOtherUsersIndexRatingTotal
+    RatingCount = 0; // Computed value - Used in: setOtherUsersIndexRatingCount
     Element: any;
     SelectedElement: any;
     ElementCellSet: any[];
     UserElementFieldSet: any[];
 
     // Client-side
-    get DataTypeText(): string {
-
-        let text = ElementFieldDataType[this.DataType];
-
-        if (this.DataType === ElementFieldDataType.Element) {
-            text += " (" + this.SelectedElement.Name + ")";
-        }
-
-        return text;
-    }
-
-    dataTypeChanged$: EventEmitter<ElementField> = new EventEmitter<ElementField>();
-    indexEnabledChanged$: EventEmitter<ElementField> = new EventEmitter<ElementField>();
     indexRatingUpdated$: EventEmitter<number> = new EventEmitter<number>();
 
     private fields: {
@@ -122,14 +35,6 @@ export class ElementField extends EntityBase {
         indexRatingPercentage: any,
         numericValueMultiplied: any,
         passiveRating: any,
-        referenceRatingMultiplied: any,
-        // Aggressive rating formula prevents the organizations with the worst rating to get any income.
-        // However, in case all ratings are equal, then no one can get any income from the pool.
-        // This flag is used to determine this special case and let all organizations get a same share from the pool.
-        // See the usage in aggressiveRating() in elementCell.js
-        // TODO Usage of this field is correct?
-        referenceRatingAllEqualFlag: boolean,
-        aggressiveRating: any,
         rating: any,
         indexIncome: any
     } = {
@@ -142,14 +47,6 @@ export class ElementField extends EntityBase {
         indexRatingPercentage: null,
         numericValueMultiplied: null,
         passiveRating: null,
-        referenceRatingMultiplied: null,
-        // Aggressive rating formula prevents the organizations with the worst rating to get any income.
-        // However, in case all ratings are equal, then no one can get any income from the pool.
-        // This flag is used to determine this special case and let all organizations get a same share from the pool.
-        // See the usage in aggressiveRating() in elementCell.js
-        // TODO Usage of this field is correct?
-        referenceRatingAllEqualFlag: true,
-        aggressiveRating: null,
         rating: null,
         indexIncome: null
     };
@@ -228,7 +125,7 @@ export class ElementField extends EntityBase {
         return this.fields.numericValueMultiplied;
     }
 
-    // TODO Since this is a fixed value based on IndexRatingCount & current user's rate,
+    // TODO Since this is a fixed value based on RatingCount & current user's rate,
     // it could be calculated on server, check it later again / coni2k - 03 Aug. '15
     otherUsersIndexRatingCount() {
 
@@ -240,7 +137,7 @@ export class ElementField extends EntityBase {
         return this.fields.otherUsersIndexRatingCount;
     }
 
-    // TODO Since this is a fixed value based on IndexRatingTotal & current user's rate,
+    // TODO Since this is a fixed value based on RatingTotal & current user's rate,
     // it could be calculated on server, check it later again / coni2k - 03 Aug. '15
     otherUsersIndexRatingTotal() {
 
@@ -270,66 +167,6 @@ export class ElementField extends EntityBase {
         return this.fields.rating;
     }
 
-    referenceRatingAllEqualFlag(value: any) {
-        return this.fields.referenceRatingAllEqualFlag;
-    }
-
-    referenceRatingMultiplied() {
-
-        if (this.fields.referenceRatingMultiplied === null) {
-            this.setReferenceRatingMultiplied(false);
-        }
-
-        return this.fields.referenceRatingMultiplied;
-    }
-
-    rejectChanges(): void {
-
-        // Related cells
-        var elementCellSet = this.ElementCellSet.slice();
-        elementCellSet.forEach((elementCell: any) => {
-            elementCell.rejectChanges();
-        });
-
-        // Related user element fields
-        var currentUserElementField = this.currentUserElementField();
-
-        if (currentUserElementField !== null) {
-            currentUserElementField.entityAspect.rejectChanges();
-
-            // Update the cache
-            this.setCurrentUserIndexRating();
-        }
-
-        this.entityAspect.rejectChanges();
-    }
-
-    remove(elementField: any) {
-
-        // Related cells
-        var elementCellSet = this.ElementCellSet.slice();
-        elementCellSet.forEach((elementCell: any) => {
-            elementCell.remove();
-        });
-
-        // Related user element fields
-        this.removeUserElementField();
-
-        this.entityAspect.setDeleted();
-    }
-
-    removeUserElementField() {
-
-        var currentUserElementField = this.currentUserElementField();
-
-        if (currentUserElementField !== null) {
-            currentUserElementField.entityAspect.setDeleted();
-
-            // Update the cache
-            this.setCurrentUserIndexRating();
-        }
-    }
-
     setCurrentUserIndexRating(updateRelated?: any) {
         updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
 
@@ -350,9 +187,9 @@ export class ElementField extends EntityBase {
     setIndexIncome(updateRelated?: any) {
         updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
 
-        var value = this.Element.totalResourcePoolAmount() * this.indexRatingPercentage();
+        var value = this.Element.Project.InitialValue * this.indexRatingPercentage();
 
-        //if (this.IndexEnabled) {
+        //if (this.RatingEnabled) {
         //logger.log(this.Name[0] + " II " + value.toFixed(2));
         //}
 
@@ -373,7 +210,7 @@ export class ElementField extends EntityBase {
 
         var value = 0; // Default value?
 
-        switch (this.Element.ResourcePool.RatingMode) {
+        switch (this.Element.Project.RatingMode) {
             case 1: { value = this.currentUserIndexRating(); break; } // Current user's
             case 2: { value = this.indexRatingAverage(); break; } // All
         }
@@ -385,7 +222,7 @@ export class ElementField extends EntityBase {
 
             // TODO Update related
             if (updateRelated) {
-                this.Element.ResourcePool.mainElement().setIndexRating();
+                this.Element.Project.mainElement().setIndexRating();
             }
 
             this.indexRatingUpdated$.emit(this.fields.indexRating);
@@ -397,7 +234,7 @@ export class ElementField extends EntityBase {
 
         var value = 0; // Default value?
 
-        var elementIndexRating = this.Element.ResourcePool.mainElement().indexRating();
+        var elementIndexRating = this.Element.Project.mainElement().indexRating();
 
         if (elementIndexRating === 0) {
             value = 0;
@@ -438,7 +275,7 @@ export class ElementField extends EntityBase {
             //logger.log(this.Name[0] + " NVMB " + value.toFixed(2));
 
             // Update related?
-            if (updateRelated && this.IndexEnabled) {
+            if (updateRelated && this.RatingEnabled) {
 
                 this.ElementCellSet.forEach((cell: any) => {
                     cell.setNumericValueMultipliedPercentage(false);
@@ -448,12 +285,6 @@ export class ElementField extends EntityBase {
 
                 this.ElementCellSet.forEach((cell: any) => {
                     cell.setPassiveRating(false);
-                });
-
-                this.setReferenceRatingMultiplied(false);
-
-                this.ElementCellSet.forEach((cell: any) => {
-                    cell.setAggressiveRating(false);
                 });
 
                 this.ElementCellSet.forEach((cell: any) => {
@@ -476,7 +307,7 @@ export class ElementField extends EntityBase {
     }
 
     setOtherUsersIndexRatingCount() {
-        this.fields.otherUsersIndexRatingCount = this.IndexRatingCount;
+        this.fields.otherUsersIndexRatingCount = this.RatingCount;
 
         // Exclude current user's
         if (this.currentUserElementField() !== null) {
@@ -485,8 +316,8 @@ export class ElementField extends EntityBase {
     }
 
     setOtherUsersIndexRatingTotal() {
-        this.fields.otherUsersIndexRatingTotal = this.IndexRatingTotal !== null ?
-            this.IndexRatingTotal :
+        this.fields.otherUsersIndexRatingTotal = this.RatingTotal !== null ?
+            this.RatingTotal :
             0;
 
         // Exclude current user's
@@ -539,101 +370,6 @@ export class ElementField extends EntityBase {
 
                 this.setIndexIncome();
             }
-        }
-    }
-
-    setReferenceRatingAllEqualFlag(value: any) {
-
-        if (this.fields.referenceRatingAllEqualFlag !== value) {
-            this.fields.referenceRatingAllEqualFlag = value;
-            return true;
-        }
-        return false;
-    }
-
-    // TODO Currently updateRelated is always "false"?
-    setReferenceRatingMultiplied(updateRelated: any) {
-        updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
-
-        var value: any = null;
-        var allEqualFlag = true;
-
-        // Validate
-        if (this.ElementCellSet.length === 0) {
-            value = 0; // ?
-        } else {
-
-            this.ElementCellSet.forEach((cell: any) => {
-
-                if (value === null) {
-
-                    switch (this.IndexSortType) {
-                        case 1: { // HighestToLowest (High number is better)
-                            value = (1 - cell.numericValueMultipliedPercentage());
-                            break;
-                        }
-                        case 2: { // LowestToHighest (Low number is better)
-                            value = cell.numericValueMultiplied();
-                            break;
-                        }
-                    }
-
-                } else {
-
-                    switch (this.IndexSortType) {
-                        case 1: { // HighestToLowest (High number is better)
-
-                            if (1 - cell.numericValueMultipliedPercentage() !== value) {
-                                allEqualFlag = false;
-                            }
-
-                            if (1 - cell.numericValueMultipliedPercentage() > value) {
-                                value = 1 - cell.numericValueMultipliedPercentage();
-                            }
-                            break;
-                        }
-                        case 2: { // LowestToHighest (Low number is better)
-
-                            if (cell.numericValueMultiplied() !== value) {
-                                allEqualFlag = false;
-                            }
-
-                            if (cell.numericValueMultiplied() > value) {
-                                value = cell.numericValueMultiplied();
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            });
-        }
-
-        //logger.log(this.Name[0] + "-" + cell.ElementItem.Name[0] + " RRMA " + value.toFixed(2));
-
-        // Set all equal flag
-        var flagUpdated = this.setReferenceRatingAllEqualFlag(allEqualFlag);
-        var ratingUpdated = false;
-
-        // Only if it's different..
-        if (this.fields.referenceRatingMultiplied !== value) {
-            this.fields.referenceRatingMultiplied = value;
-
-            ratingUpdated = true;
-
-            //logger.log(this.Name[0] + " RRMB " + value.toFixed(2));
-        }
-
-        // Update related
-        if ((flagUpdated || ratingUpdated) && updateRelated) {
-
-            // TODO ?!
-
-            this.ElementCellSet.forEach((cell: any) => {
-                cell.setAggressiveRating(false);
-            });
-
-            // this.setAggressiveRating();
         }
     }
 }

@@ -20,5 +20,5 @@ export class EnvironmentSettings {
     /**
      * Service application (WebApi) url
      */
-    static get serviceAppUrl(): string { return "http://localhost:15001"; }
+    static get serviceAppUrl(): string { return "https://api.wealth.forcrowd.org"; }
 }

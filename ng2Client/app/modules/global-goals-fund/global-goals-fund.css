@@ -1,4 +1,8 @@
-﻿.fa-heart, .fa-heart-o {
+﻿img {
+    border: 1px solid #000000;
+}
+
+.fa-heart, .fa-heart-o {
     color: #E5233D;
 }
 

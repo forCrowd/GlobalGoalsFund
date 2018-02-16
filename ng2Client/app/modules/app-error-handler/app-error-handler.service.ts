@@ -16,7 +16,7 @@ export class AppErrorHandler implements ErrorHandler {
     get errorLimitReached(): boolean { return this.errorCounter > 10 };
 
     constructor(private http: Http, private logger: Logger) {
-        this.errorHandlerUrl = Settings.serviceAppUrl + "/api/Exception/Record";
+        this.errorHandlerUrl = Settings.serviceAppUrl + "/api/v1/Exception/Record";
     }
 
     /**

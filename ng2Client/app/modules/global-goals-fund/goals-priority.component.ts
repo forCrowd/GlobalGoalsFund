@@ -15,7 +15,7 @@ import { Logger } from "../../modules/logger/logger.module";
 export class GoalsPriorityComponent {
 
     projectElement: any = null;
-    resourcePoolKey: any = { username: "sample", resourcePoolKey: "Global-Goals-Fund" };
+    resourcePoolKey: any = { username: "forCrowd", resourcePoolKey: "7" };
     resourcePool: any = null;
 
     constructor(private dataService: DataService,

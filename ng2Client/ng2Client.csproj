@@ -24,6 +24,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,17 +63,6 @@
     <Content Include="app\images\global-goals-fund\SDG_Icons-8.png" />
     <Content Include="app\images\global-goals-fund\SDG_Icons-9.png" />
     <Content Include="app\images\global-goals-fund\SDG_Wheel_Transparent-01.png" />
-    <Content Include="app\modules\account\account-edit.component.html" />
-    <Content Include="app\modules\account\account-overview.component.html" />
-    <Content Include="app\modules\account\add-password.component.html" />
-    <Content Include="app\modules\account\change-email.component.html" />
-    <Content Include="app\modules\account\change-password.component.html" />
-    <Content Include="app\modules\account\change-username.component.html" />
-    <Content Include="app\modules\account\confirm-email.component.html" />
-    <Content Include="app\modules\account\login.component.html" />
-    <Content Include="app\modules\account\register.component.html" />
-    <Content Include="app\modules\account\reset-password.component.html" />
-    <Content Include="app\modules\account\social-logins.component.html" />
     <Content Include="app\modules\global-goals-fund\dashboard.component.html" />
     <Content Include="app\modules\global-goals-fund\global-goals-fund.css" />
     <Content Include="app\modules\global-goals-fund\sponsors.component.html" />
@@ -80,19 +70,14 @@
     <Content Include="app\modules\global-goals-fund\additional-goals.component.html" />
     <Content Include="app\modules\global-goals-fund\global-goals.component.html" />
     <Content Include="app\modules\core\not-found.component.html" />
-    <Content Include="app\modules\resource-pool\resource-pool-editor.component.css" />
-    <Content Include="app\modules\resource-pool\resource-pool-editor.component.html" />
     <Content Include="app\css\app.css" />
-    <Content Include="app\modules\user\profile.component.html" />
-    <Content Include="app\modules\resource-pool\resource-pool-viewer.component.html" />
-    <Content Include="app\dev\app.component.css" />
-    <Content Include="app\dev\app.component.html" />
     <Content Include="app\images\forCrowd_Logo_142x30.jpg" />
     <Content Include="app\modules\ng-chart\ng-chart.component.css" />
     <Content Include="app\modules\ng-chart\ng-chart.component.html" />
-    <Content Include="app\dev\Readme.md" />
     <None Include="app\settings\setup\Readme.md" />
     <None Include="app_offline.htm_" />
+    <Content Include="app\modules\resource-pool\resource-pool-editor.component.css" />
+    <Content Include="app\modules\resource-pool\resource-pool-editor.component.html" />
     <Content Include="favicon.ico" />
     <None Include="package.json" />
     <Content Include="gulpfile.js" />
@@ -111,23 +96,8 @@
   <ItemGroup>
     <TypeScriptCompile Include="app\app.module.ts" />
     <TypeScriptCompile Include="app\app.component.ts" />
-    <TypeScriptCompile Include="app\dev\app.component.ts" />
-    <TypeScriptCompile Include="app\dev\app-basic.module.ts" />
-    <TypeScriptCompile Include="app\dev\app.module.ts" />
     <TypeScriptCompile Include="app\main-aot.ts" />
     <TypeScriptCompile Include="app\main.ts" />
-    <TypeScriptCompile Include="app\modules\account\account.module.ts" />
-    <TypeScriptCompile Include="app\modules\account\account-edit.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\account-overview.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\add-password.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\change-email.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\change-password.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\change-username.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\confirm-email.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\login.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\register.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\reset-password.component.ts" />
-    <TypeScriptCompile Include="app\modules\account\social-logins.component.ts" />
     <TypeScriptCompile Include="app\modules\core\core-router.module.ts" />
     <TypeScriptCompile Include="app\modules\core\core.module.ts" />
     <TypeScriptCompile Include="app\modules\global-goals-fund\dashboard.component.ts" />
@@ -138,10 +108,6 @@
     <TypeScriptCompile Include="app\modules\global-goals-fund\global-goals.component.ts" />
     <TypeScriptCompile Include="app\modules\core\not-found.component.ts" />
     <TypeScriptCompile Include="app\modules\data\entities\entity-base.ts" />
-    <TypeScriptCompile Include="app\modules\resource-pool\resource-pool-editor.component.ts" />
-    <TypeScriptCompile Include="app\modules\resource-pool\resource-pool.module.ts" />
-    <TypeScriptCompile Include="app\modules\user\profile.component.ts" />
-    <TypeScriptCompile Include="app\modules\resource-pool\resource-pool-viewer.component.ts" />
     <TypeScriptCompile Include="app\modules\data\entities\element.ts" />
     <TypeScriptCompile Include="app\modules\data\entities\element-cell.ts" />
     <TypeScriptCompile Include="app\modules\data\entities\element-field.ts" />
@@ -165,11 +131,11 @@
     <TypeScriptCompile Include="app\modules\ng-chart\chart-data-item.ts" />
     <TypeScriptCompile Include="app\modules\ng-chart\ng-chart.component.ts" />
     <TypeScriptCompile Include="app\modules\ng-chart\ng-chart.module.ts" />
+    <TypeScriptCompile Include="app\modules\resource-pool\resource-pool-editor.component.ts" />
+    <TypeScriptCompile Include="app\modules\resource-pool\resource-pool.module.ts" />
     <TypeScriptCompile Include="app\modules\resource-pool\symbolic.pipe.ts" />
-    <TypeScriptCompile Include="app\modules\user\user.module.ts" />
     <TypeScriptCompile Include="app\utils.ts" />
     <TypeScriptCompile Include="app\rxjs-extensions.ts" />
-    <TypeScriptCompile Include="app\modules\core\auth-guard.service.ts" />
     <TypeScriptCompile Include="app\modules\core\can-deactivate-guard.service.ts" />
     <TypeScriptCompile Include="app\modules\core\dynamic-title-resolve.service.ts" />
     <TypeScriptCompile Include="app\modules\core\google-analytics.service.ts" />

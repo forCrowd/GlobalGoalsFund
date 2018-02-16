@@ -14,7 +14,7 @@ import { Logger } from "../../modules/logger/logger.module";
 })
 export class AdditionalGoalsComponent {
 
-    resourcePoolKey: any = { username: "sample", resourcePoolKey: "Global-Goals-Fund" };
+    resourcePoolKey: any = { username: "forCrowd", resourcePoolKey: "7" };
     resourcePool: any = null;
     legalEntityElement: any = null;
     licenseElement: any = null;

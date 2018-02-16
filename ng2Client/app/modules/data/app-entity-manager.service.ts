@@ -15,7 +15,6 @@ import { ResourcePool } from "./entities/resource-pool";
 import { User } from "./entities/user";
 import { UserElementCell } from "./entities/user-element-cell";
 import { UserElementField } from "./entities/user-element-field";
-import { UserResourcePool } from "./entities/user-resource-pool";
 import { Logger } from "../logger/logger.module";
 import { Settings } from "../../settings/settings";
 
@@ -26,7 +25,7 @@ export class AppEntityManager extends EntityManager {
 
     constructor(private logger: Logger) {
         super({
-            serviceName: Settings.serviceAppUrl + "/odata"
+            serviceName: Settings.serviceAppUrl + "/odata/v1"
         });
 
         config.initializeAdapterInstance("uriBuilder", "odata");
@@ -57,12 +56,11 @@ export class AppEntityManager extends EntityManager {
         store.registerEntityTypeCtor("ElementCell", ElementCell, ElementCell.initializer);
         store.registerEntityTypeCtor("ElementField", ElementField, ElementField.initializer);
         store.registerEntityTypeCtor("ElementItem", ElementItem, ElementItem.initializer);
-        store.registerEntityTypeCtor("ResourcePool", ResourcePool, ResourcePool.initializer);
+        store.registerEntityTypeCtor("Project", ResourcePool, ResourcePool.initializer);
 
         store.registerEntityTypeCtor("User", User, User.initializer);
         store.registerEntityTypeCtor("UserElementCell", UserElementCell, UserElementCell.initializer);
         store.registerEntityTypeCtor("UserElementField", UserElementField, UserElementField.initializer);
-        store.registerEntityTypeCtor("UserResourcePool", UserResourcePool, UserResourcePool.initializer);
     }
 
     getMetadata(): Observable<Object> {

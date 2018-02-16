@@ -18,19 +18,19 @@ export class Element extends EntityBase {
 
                 // Main element check: If there is another element that its IsMainElement flag is true, make it false
                 if (value) {
-                    this.ResourcePool.ElementSet.forEach((element: any) => {
+                    this.Project.ElementSet.forEach((element: any) => {
                         if (element !== this && element.IsMainElement) {
                             element.IsMainElement = false;
                         }
                     });
 
                     // Update selectedElement of resourcePool
-                    this.ResourcePool.selectedElement(this);
+                    this.Project.selectedElement(this);
                 }
             }
         }
     }
-    ResourcePool: any;
+    Project: ResourcePool;
     ElementFieldSet: any[];
     ElementItemSet: any[];
     ParentFieldSet: any[];
@@ -44,9 +44,6 @@ export class Element extends EntityBase {
         familyTree: any,
         elementFieldIndexSet: any,
         indexRating: any,
-        directIncomeField: any,
-        multiplierField: any,
-        totalResourcePoolAmount: any
     } = {
         // Server-side
         IsMainElement: false,
@@ -56,47 +53,10 @@ export class Element extends EntityBase {
         familyTree: null,
         elementFieldIndexSet: null,
         indexRating: null,
-        directIncomeField: null,
-        multiplierField: null,
-        totalResourcePoolAmount: null
     };
 
     static initializer(entity: Element) {
         super.initializer(entity);
-    }
-
-    directIncome() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.directIncome();
-        });
-
-        return value;
-    }
-
-    directIncomeField() {
-
-        // TODO In case of add / remove fields?
-        if (this.fields.directIncomeField === null) {
-            this.setDirectIncomeField();
-        }
-
-        return this.fields.directIncomeField;
-    }
-
-    directIncomeIncludingResourcePoolAmount() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.directIncomeIncludingResourcePoolAmount();
-        });
-
-        return value;
     }
 
     elementFieldIndexSet() {
@@ -116,12 +76,6 @@ export class Element extends EntityBase {
         return this.fields.familyTree;
     }
 
-    // UI related: Determines whether the chart & element details will use full row (col-md-4 vs col-md-12 etc.)
-    // TODO Obsolete for the moment!
-    fullSize() {
-        return (this.ElementFieldSet.length > 4) || this.elementFieldIndexSet().length > 2;
-    }
-
     getElementFieldIndexSet(element: any) {
 
         var sortedElementFieldSet = element.getElementFieldSetSorted();
@@ -129,7 +83,7 @@ export class Element extends EntityBase {
 
         // Validate
         sortedElementFieldSet.forEach((field: any) => {
-            if (field.IndexEnabled) {
+            if (field.RatingEnabled) {
                 indexSet.push(field);
             }
 
@@ -177,28 +131,6 @@ export class Element extends EntityBase {
         return this.fields.indexRating;
     }
 
-    multiplier() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.multiplier();
-        });
-
-        return value;
-    }
-
-    multiplierField() {
-
-        // TODO In case of add / remove field?
-        if (this.fields.multiplierField === null) {
-            this.setMultiplierField();
-        }
-
-        return this.fields.multiplierField;
-    }
-
     parent() {
 
         // TODO In case of add / remove elements?
@@ -207,52 +139,6 @@ export class Element extends EntityBase {
         }
 
         return this.fields.parent;
-    }
-
-    rejectChanges(): void {
-        this.entityAspect.rejectChanges();
-    }
-
-    remove() {
-
-        // Remove from selectedElement
-        if (this.ResourcePool.selectedElement() === this) {
-            this.ResourcePool.selectedElement(null);
-        }
-
-        // Related items
-        var elementItemSet = this.ElementItemSet.slice();
-        elementItemSet.forEach((elementItem: any) => {
-            elementItem.remove();
-        });
-
-        // Related fields
-        var elementFieldSet = this.ElementFieldSet.slice();
-        elementFieldSet.forEach((elementField: any) => {
-            elementField.remove();
-        });
-
-        this.entityAspect.setDeleted();
-    }
-
-    resourcePoolAmount() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.resourcePoolAmount();
-        });
-
-        return value;
-    }
-
-    setDirectIncomeField() {
-        var result = this.ElementFieldSet.filter((field: any) => field.DataType === 11);
-
-        if (result.length > 0) {
-            this.fields.directIncomeField = result[0];
-        }
     }
 
     setElementFieldIndexSet() {
@@ -294,42 +180,10 @@ export class Element extends EntityBase {
         }
     }
 
-    setMultiplierField() {
-        var result = this.ElementFieldSet.filter((field: any) => field.DataType === 12);
-
-        if (result.length > 0) {
-            this.fields.multiplierField = result[0];
-        }
-    }
-
     setParent() {
         if (this.ParentFieldSet.length > 0) {
             this.fields.parent = this.ParentFieldSet[0].Element;
         }
-    }
-
-    totalDirectIncome() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.totalDirectIncome();
-        });
-
-        return value;
-    }
-
-    totalDirectIncomeIncludingResourcePoolAmount() {
-
-        // TODO Check totalIncome notes
-
-        var value = 0;
-        this.ElementItemSet.forEach((item: any) => {
-            value += item.totalDirectIncomeIncludingResourcePoolAmount();
-        });
-
-        return value;
     }
 
     totalIncome() {
@@ -352,46 +206,5 @@ export class Element extends EntityBase {
         }
 
         return this.totalIncome() / this.ElementItemSet.length;
-    }
-
-    // TODO This is out of pattern!
-    totalResourcePoolAmount() {
-
-        //console.log("res", this.resourcePool);
-
-        // TODO Check totalIncome notes
-
-        var value: any;
-
-        if (this === this.ResourcePool.mainElement()) {
-
-            value = this.ResourcePool.InitialValue;
-
-            this.ElementItemSet.forEach((item: any) => {
-                value += item.totalResourcePoolAmount();
-            });
-
-        } else {
-            if (this.ResourcePool.mainElement() !== null) {
-                value = this.ResourcePool.mainElement().totalResourcePoolAmount();
-            }
-        }
-
-        //logger.log("TRPA-A " + value.toFixed(2));
-
-        if (this.fields.totalResourcePoolAmount !== value) {
-            this.fields.totalResourcePoolAmount = value;
-
-            //logger.log("TRPA-B " + value.toFixed(2));
-
-            this.elementFieldIndexSet().forEach((field: any) => {
-                // TODO How about this check?
-                // if (field.DataType === 11) { - 
-                field.setIndexIncome();
-                // }
-            });
-        }
-
-        return value;
     }
 }

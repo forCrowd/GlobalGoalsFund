@@ -17,26 +17,6 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul *ngIf="currentUser" class="nav navbar-nav navbar-text navbar-right">
-                    <!--<li [hidden]="currentUser.isAuthenticated()">
-                        <button (click)="navigate('/app/account/register')" type="button" class="btn-link">
-                            Register
-                        </button>
-                    </li>
-                    <li [hidden]="currentUser.isAuthenticated()">
-                        <button (click)="navigate('/app/account/login')" type="button" class="btn-link">
-                            Login
-                        </button>
-                    </li>-->
-                    <!--<li [hidden]="!currentUser.isAuthenticated() || !currentUser.IsAnonymous">
-                        <button (click)="showAnonymousAccountInfoBox()" type="button" class="btn-link">
-                            <span class="fa fa-info-circle fa-lg" aria-hidden="true"></span>
-                        </button>
-                    </li>-->
-                    <li [hidden]="!currentUser.isAuthenticated()">
-                        <button (click)="navigate('/app/account')" type="button" class="btn-link">
-                            Account
-                        </button>
-                    </li>
                     <li [hidden]="!currentUser.isAuthenticated()">
                         <button (click)="logout()" type="button" class="btn-link">
                             Logout
@@ -49,56 +29,38 @@
 
     <div class="container body-content">
 
-        <div class="bs-callout bs-callout-info">
+        <div class="bs-callout bs-callout-info" [hidden]="!displayInfoBox">
             <p>
-                Global Goals Fund is our project that we presented at United Nation's <a href="http://connect2effect.com">Connect2Effect Hackathon</a>.
+                An interactive crowdfunding platform for projects/ideas about Sustainable Developer Goals (SDGs).
             </p>
             <p>
-                This prototype is specifically customized for the hackathon and we are not planning to develop it further at this moment.<br />
-                You can reach to our original project here: <a href="https://wealth.forcrowd.org">Wealth Economy</a>
+                By using this platform, the users can vote for the importance of three categories:
+            </p>
+            <ul>
+                <li><strong>SDG</strong>: Which of the SDGs should be focused and solved first?</li>
+                <li><strong>Legal Entity</strong>: Business model of the project can be "non-profit" / "for-profit". Which type of legal entity should get more funding?</li>
+                <li><strong>License</strong>: If the project is about developing a software, which type of license should get more funding?</li>
+            </ul>
+            <p>
+                Additionally, users can also choose the importance of each category.
+            </p>
+            <p>
+                Based on these results, the platform distributes the funds to all ideas.
+            </p>
+            <hr />
+            <p>
+                Global Goals Fund is a custom prototype that we developed and presented at United Nation's <a href="http://connect2effect.com">Connect2Effect Hackathon</a>.
+            </p>
+            <p>
+                You can visit our original project here: <a href="https://wealth.forcrowd.org">Wealth Economy</a>
             </p>
             <p>
                 If you have any questions or would like to have more information, please feel free to contact us.
             </p>
-        </div>
-
-        <!--Anonymous account info block-->
-        <div class="g-padding-20 g-pb-0" [hidden]="hideAnonymousAccountInfoBox">
-            <!--<div class="modal-header">
-                <h3 class="modal-title">Guest Account</h3>
-            </div>-->
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 g-mb-20">
-                        <p>
-                            A guest account has been created for you to save your changes temporarily.<br />
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-center">
-                        <p class="g-mb-30">
-                            Would like to keep this account?<br />
-                            Please update your email address.
-                        </p>
-                        <p>
-                            <a class="btn btn-primary btn-block" routerLink="/app/account/change-email" (click)="closeAnonymousAccountInfoBox()">Change email</a>
-                        </p>
-                    </div>
-                    <div class="col-md-6 text-center">
-                        <p class="g-mb-30">
-                            Do you have an existing account?<br />
-                            Please login with your credentials.
-                        </p>
-                        <p>
-                            <a class="btn btn-primary btn-block" routerLink="/app/account/login" (click)="closeAnonymousAccountInfoBox()">Login</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-default" type="button" (click)="closeAnonymousAccountInfoBox()">Skip for now</button>
+            <div class="text-center g-mt-20">
+                <button (click)="hideInfoBox()" type="button" class="btn btn-default">Close</button>
             </div>
         </div>
-        <!--Anonymous account info block end-->
 
         <router-outlet></router-outlet>
 

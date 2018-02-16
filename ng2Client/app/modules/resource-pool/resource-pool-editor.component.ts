@@ -41,36 +41,6 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
         this.loadChartData();
     }
 
-    decreaseElementMultiplier(element: any) {
-        this.resourcePoolService.updateElementMultiplier(element, "decrease");
-        this.saveStream.next();
-    }
-
-    decreaseIndexRating(field: any) {
-        this.resourcePoolService.updateElementFieldIndexRating(field, "decrease");
-        this.saveStream.next();
-    }
-
-    decreaseResourcePoolRate() {
-        this.resourcePoolService.updateResourcePoolRate(this.resourcePool, "decrease");
-        this.saveStream.next();
-    }
-
-    increaseElementMultiplier(element: any) {
-        this.resourcePoolService.updateElementMultiplier(element, "increase");
-        this.saveStream.next();
-    }
-
-    increaseIndexRating(field: any) {
-        this.resourcePoolService.updateElementFieldIndexRating(field, "increase");
-        this.saveStream.next();
-    }
-
-    increaseResourcePoolRate() {
-        this.resourcePoolService.updateResourcePoolRate(this.resourcePool, "increase");
-        this.saveStream.next();
-    }
-
     initialize(username: any, resourcePoolKey: any, user: any) {
 
         // If there is no change, no need to continue
@@ -128,8 +98,8 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
 
             // TODO Check this rule?
 
-            if (element === element.ResourcePool.mainElement() &&
-                (element.totalIncome() > 0 || element.directIncomeField() !== null)) {
+            if (element === element.Project.mainElement() &&
+                element.totalIncome() > 0) {
 
                 const options: Highcharts.Options = {
                     title: { text: element.Name },
@@ -158,7 +128,7 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
 
                 element.ElementItemSet.forEach((elementItem: any) => {
                     elementItem.ElementCellSet.forEach((elementCell: any) => {
-                        if (elementCell.ElementField.IndexEnabled) {
+                        if (elementCell.ElementField.RatingEnabled) {
                             data.push(new ChartDataItem(elementCell.ElementItem.Name,
                                 +elementCell.numericValue().toFixed(2),
                                 elementCell.numericValueUpdated$));
@@ -189,15 +159,6 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
         }
     }
 
-    manageResourcePool(): void {
-        const editLink = "/" + this.config.username + "/" + this.config.resourcePoolKey + "/edit";
-        this.router.navigate([editLink]);
-    }
-
-    manageResourcePoolEnabled(): boolean {
-        return this.resourcePool.User === this.currentUser;
-    }
-
     ngOnDestroy(): void {
         for (let i = 0; i < this.subscriptions.length; i++) {
             this.subscriptions[i].unsubscribe();
@@ -225,41 +186,11 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
         this.initialize(username, resourcePoolKey, this.dataService.currentUser);
     }
 
-    resetElementMultiplier(element: any) {
-        this.resourcePoolService.updateElementMultiplier(element, "reset");
-        this.saveStream.next();
-    }
-
-    resetIndexRating(field: any) {
-        this.resourcePoolService.updateElementFieldIndexRating(field, "reset");
-        this.saveStream.next();
-    }
-
-    resetResourcePoolRate() {
-        this.resourcePoolService.updateResourcePoolRate(this.resourcePool, "reset");
-        this.saveStream.next();
-    }
-
     saveChangesStart() {
         this.isSaving = true;
     }
 
     saveChangesCompleted() {
         this.isSaving = false;
-    }
-
-    toggleDescription() {
-        this.displayDescription = !this.displayDescription;
-    }
-
-    // Index Details
-    toggleIndexDetails() {
-        this.displayIndexDetails = !this.displayIndexDetails;
-        this.loadChartData();
-    }
-
-    updateElementCellDecimalValue(cell: any, value: number) {
-        this.resourcePoolService.updateElementCellDecimalValue(cell, value);
-        this.saveStream.next();
     }
 }

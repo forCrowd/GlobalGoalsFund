@@ -13,7 +13,7 @@ import { Logger } from "../../modules/logger/logger.module";
 })
 export class DashboardComponent {
 
-    resourcePoolKey: any = { username: "sample", resourcePoolKey: "Global-Goals-Fund" };
+    resourcePoolKey: any = { username: "forCrowd", resourcePoolKey: "7" };
     resourcePool: any = null;
 
     constructor(private dataService: DataService,

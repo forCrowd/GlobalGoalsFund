@@ -4,45 +4,14 @@ import { stripInvalidChars } from "../../../utils";
 export class ResourcePool extends EntityBase {
 
     // Server-side
-    Id: number = 0;
-    UserId: number = 0;
-    get Name(): string {
-        return this.fields.name;
-    }
-    set Name(value: string) {
-        if (this.fields.name !== value) {
-            var oldStripped = stripInvalidChars(this.fields.name);
-            this.fields.name = value;
-
-            if (this.initialized) {
-
-                // If "Key" is not a custom value (generated through Name), then keep updating it
-                if (this.Key === oldStripped) {
-                    this.Key = value;
-                }
-            }
-        }
-    }
-    get Key(): string {
-        return this.fields.key;
-    }
-    set Key(value: string) {
-        var newValue = stripInvalidChars(value);
-
-        if (this.fields.key !== newValue) {
-            this.fields.key = newValue;
-        }
-    }
-    UseFixedResourcePoolRate = true;
-    InitialValue: number = 0;
-    ResourcePoolRateTotal: number = 0; // Computed value - Used in: setOtherUsersResourcePoolRateTotal
-    ResourcePoolRateCount: number = 0; // Computed value - Used in: setOtherUsersResourcePoolRateCount
-    RatingCount: number = 0; // Computed value - Used in: resource-pool-editor.html
+    Id = 0;
+    UserId = 0;
+    Name = "";
+    Key = "";
+    InitialValue = 0;
+    RatingCount = 0; // Computed value - Used in: resource-pool-editor.html
     User: any;
     ElementSet: any[];
-
-    // TODO Move this to field.js?
-    displayMultiplierFunctions = true; // In some cases, it's not necessary for the user to change multiplier
 
     static initializer(entity: ResourcePool) {
         super.initializer(entity);
@@ -56,14 +25,12 @@ export class ResourcePool extends EntityBase {
         if (this.fields.ratingMode !== value) {
             this.fields.ratingMode = value;
 
-            this.setResourcePoolRate();
-
             this.ElementSet.forEach((element: any) => {
 
                 element.ElementFieldSet.forEach((field: any) => {
 
                     // Field calculations
-                    if (field.IndexEnabled) {
+                    if (field.RatingEnabled) {
                         field.setIndexRating();
                     }
 
@@ -72,12 +39,7 @@ export class ResourcePool extends EntityBase {
 
                             // Cell calculations
                             switch (field.DataType) {
-                                case 2:
-                                case 3:
-                                case 4:
-                                // TODO 5 (DateTime?)
-                                case 11:
-                                case 12: {
+                                case 4: {
                                     cell.setNumericValue();
                                     break;
                                 }
@@ -90,26 +52,14 @@ export class ResourcePool extends EntityBase {
     }
 
     private fields: {
-        currentUserResourcePoolRate: any,
-        isAdded: boolean,
         key: string,
         name: string,
-        otherUsersResourcePoolRateTotal: any,
-        otherUsersResourcePoolRateCount: any,
         ratingMode: any, // Only my ratings vs. All users" ratings
-        resourcePoolRate: any,
-        resourcePoolRatePercentage: any,
         selectedElement: any,
     } = {
-        currentUserResourcePoolRate: null,
-        isAdded: false,
         key: "",
         name: "",
-        otherUsersResourcePoolRateTotal: null,
-        otherUsersResourcePoolRateCount: null,
         ratingMode: 1, // Only my ratings vs. All users" ratings
-        resourcePoolRate: null,
-        resourcePoolRatePercentage: null,
         selectedElement: null,
     };
 
@@ -125,8 +75,8 @@ export class ResourcePool extends EntityBase {
             this.ElementSet.forEach((element: any) => {
                 element.ElementFieldSet.forEach((elementField: any) => {
                     elementField.UserElementFieldSet.forEach((userElementField: any) => {
-                        elementField.IndexRatingTotal += userElementField.IndexRating;
-                        elementField.IndexRatingCount += 1;
+                        elementField.RatingTotal += userElementField.IndexRating;
+                        elementField.RatingCount += 1;
 
                         if (userRatings.indexOf(userElementField.UserId) === -1) {
                             userRatings.push(userElementField.UserId);
@@ -137,10 +87,10 @@ export class ResourcePool extends EntityBase {
                     elementField.ElementCellSet.forEach((elementCell: any) => {
                         elementCell.UserElementCellSet.forEach((userElementCell: any) => {
                             elementCell.StringValue = ""; // TODO ?
-                            elementCell.NumericValueTotal += userElementCell.DecimalValue; // TODO Correct approach?
-                            elementCell.NumericValueCount += 1;
+                            elementCell.DecimalValueTotal += userElementCell.DecimalValue; // TODO Correct approach?
+                            elementCell.DecimalValueCount += 1;
 
-                            if (elementField.IndexEnabled) {
+                            if (elementField.RatingEnabled) {
                                 if (userRatings.indexOf(userElementCell.UserId) === -1) {
                                     userRatings.push(userElementCell.UserId);
                                 }
@@ -153,10 +103,6 @@ export class ResourcePool extends EntityBase {
             // Rating count
             this.RatingCount = userRatings.length;
         }
-
-        // Set otherUsers" data
-        this.setOtherUsersResourcePoolRateTotal();
-        this.setOtherUsersResourcePoolRateCount();
 
         // Elements
         if (typeof this.ElementSet !== "undefined") {
@@ -185,141 +131,10 @@ export class ResourcePool extends EntityBase {
         this.updateCache();
     }
 
-    currentUserResourcePool(): any {
-        return null;
-    }
-
-    currentUserResourcePoolRate() {
-
-        if (this.fields.currentUserResourcePoolRate === null) {
-            this.setCurrentUserResourcePoolRate(false);
-        }
-
-        return this.fields.currentUserResourcePoolRate;
-    }
-
-    displayResourcePoolDetails() {
-        return this.selectedElement().directIncomeField() !== null &&
-            this.selectedElement().elementFieldIndexSet().length > 0;
-    }
-
-    // Checks whether resource pool has any item that can be rateable
-    // Obsolete: Replaced with RatingCount > 0 / coni2k - 21 Feb. '16
-    displayRatingMode() {
-
-        // Check resource pool level first
-        if (!this.UseFixedResourcePoolRate) {
-            return true;
-        }
-
-        // Field index level
-        for (var elementIndex = 0; elementIndex < this.ElementSet.length; elementIndex++) {
-            var element = this.ElementSet[elementIndex];
-
-            // If there are multiple indexes, then the users can set index rating
-            if (element.elementFieldIndexSet().length > 1) {
-                return true;
-            }
-
-            // If there is an index without a fixed value
-            if (element.elementFieldIndexSet().length > 0 && !element.elementFieldIndexSet()[0].UseFixedValue) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     mainElement() {
         var result = this.ElementSet.filter((element: any) => element.IsMainElement);
 
         return result.length > 0 ? result[0] : null;
-    }
-
-    // TODO Since this is a fixed value based on ResourcePoolRateCount & current user's rate,
-    // it could be calculated on server, check it later again / coni2k - 03 Aug. '15
-    otherUsersResourcePoolRateCount() {
-
-        // Set other users" value on the initial call
-        if (this.fields.otherUsersResourcePoolRateCount === null) {
-            this.setOtherUsersResourcePoolRateCount();
-        }
-
-        return this.fields.otherUsersResourcePoolRateCount;
-    }
-
-    // TODO Since this is a fixed value based on ResourcePoolRateTotal & current user's rate,
-    // it could be calculated on server, check it later again / coni2k - 03 Aug. '15
-    otherUsersResourcePoolRateTotal() {
-
-        // Set other users" value on the initial call
-        if (this.fields.otherUsersResourcePoolRateTotal === null) {
-            this.setOtherUsersResourcePoolRateTotal();
-        }
-
-        return this.fields.otherUsersResourcePoolRateTotal;
-    }
-
-    remove() {
-
-        // Related elements
-        var elementSet = this.ElementSet.slice();
-        elementSet.forEach((element: any) => {
-            element.remove();
-        });
-
-        // Related user resource pools
-        this.removeUserResourcePool();
-
-        this.entityAspect.setDeleted();
-    }
-
-    removeUserResourcePool() {
-    }
-
-    resourcePoolRate() {
-
-        if (this.fields.resourcePoolRate === null) {
-            this.setResourcePoolRate(false);
-        }
-
-        return this.fields.resourcePoolRate;
-    }
-
-    resourcePoolRateAverage() {
-
-        if (this.resourcePoolRateCount() === null) {
-            return null;
-        }
-
-        return this.resourcePoolRateCount() === 0 ?
-            0 :
-            this.resourcePoolRateTotal() / this.resourcePoolRateCount();
-    }
-
-    resourcePoolRateCount() {
-        return this.UseFixedResourcePoolRate ?
-            this.currentUserResourcePool() !== null && this.currentUserResourcePool().UserId === this.UserId ? // If it belongs to current user
-                1 :
-                this.otherUsersResourcePoolRateCount() :
-            this.otherUsersResourcePoolRateCount() + 1; // There is always default value, increase count by 1
-    }
-
-    resourcePoolRatePercentage() {
-
-        if (this.fields.resourcePoolRatePercentage === null) {
-            this.setResourcePoolRatePercentage(false);
-        }
-
-        return this.fields.resourcePoolRatePercentage;
-    }
-
-    resourcePoolRateTotal() {
-        return this.UseFixedResourcePoolRate ?
-            this.currentUserResourcePool() !== null && this.currentUserResourcePool().UserId === this.UserId ? // If it belongs to current user
-                this.currentUserResourcePoolRate() :
-                this.otherUsersResourcePoolRateTotal() :
-            this.otherUsersResourcePoolRateTotal() + this.currentUserResourcePoolRate();
     }
 
     selectedElement(value?: any) {
@@ -337,89 +152,6 @@ export class ResourcePool extends EntityBase {
         return this.fields.selectedElement;
     }
 
-    setCurrentUserResourcePoolRate(updateRelated?: any) {
-        updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
-
-        var value = this.currentUserResourcePool() !== null ?
-            this.currentUserResourcePool().ResourcePoolRate :
-            10; // Default value?
-
-        if (this.fields.currentUserResourcePoolRate !== value) {
-            this.fields.currentUserResourcePoolRate = value;
-
-            // Update related
-            if (updateRelated) {
-                this.setResourcePoolRate();
-            }
-        }
-    }
-
-    setOtherUsersResourcePoolRateCount() {
-
-        this.fields.otherUsersResourcePoolRateCount = this.ResourcePoolRateCount;
-
-        // Exclude current user's
-        if (this.currentUserResourcePool() !== null) {
-            this.fields.otherUsersResourcePoolRateCount--;
-        }
-    }
-
-    setOtherUsersResourcePoolRateTotal() {
-        this.fields.otherUsersResourcePoolRateTotal = this.ResourcePoolRateTotal !== null ?
-            this.ResourcePoolRateTotal :
-            0;
-
-        // Exclude current user's
-        if (this.currentUserResourcePool() !== null) {
-            this.fields.otherUsersResourcePoolRateTotal -= this.currentUserResourcePool().ResourcePoolRate;
-        }
-    }
-
-    setResourcePoolRate(updateRelated?: any) {
-        updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
-
-        var value: any;
-
-        if (this.UseFixedResourcePoolRate) {
-            value = this.resourcePoolRateAverage();
-        } else {
-            switch (this.RatingMode) {
-                case 1: { value = this.currentUserResourcePoolRate(); break; } // Current user's
-                case 2: { value = this.resourcePoolRateAverage(); break; } // All
-            }
-        }
-
-        if (this.fields.resourcePoolRate !== value) {
-            this.fields.resourcePoolRate = value;
-
-            // Update related
-            if (updateRelated) {
-                this.setResourcePoolRatePercentage();
-            }
-        }
-    }
-
-    setResourcePoolRatePercentage(updateRelated?: any) {
-        updateRelated = typeof updateRelated === "undefined" ? true : updateRelated;
-
-        var value = this.resourcePoolRate() === 0
-            ? 0
-            : this.resourcePoolRate() / 100;
-
-        if (this.fields.resourcePoolRatePercentage !== value) {
-            this.fields.resourcePoolRatePercentage = value;
-
-            // Update related
-            if (updateRelated) {
-                this.ElementSet.forEach((element: any) => {
-                    element.ElementItemSet.forEach((item: any) => {
-                        item.setResourcePoolAmount();
-                    });
-                });
-            }
-        }
-    }
-
     toggleRatingMode() {
         this.RatingMode = this.RatingMode === 1 ? 2 : 1;
     }
@@ -429,8 +161,6 @@ export class ResourcePool extends EntityBase {
     updateCache() {
 
         var isUnchanged = false;
-
-        this.setCurrentUserResourcePoolRate();
 
         // Elements
         if (typeof this.ElementSet !== "undefined") {
@@ -443,7 +173,7 @@ export class ResourcePool extends EntityBase {
                 if (typeof element.ElementFieldSet !== "undefined") {
                     element.ElementFieldSet.forEach((field: any) => {
 
-                        if (field.IndexEnabled) {
+                        if (field.RatingEnabled) {
                             // TODO Actually index rating can't be set through resourcePoolEdit page and no need to update this cache
                             // But still keep it as a reminder? / coni2k - 29 Nov. '15
                             field.setCurrentUserIndexRating();
@@ -469,36 +199,9 @@ export class ResourcePool extends EntityBase {
                                         }
                                         break;
                                     }
-                                    case 2:
-                                    case 3:
                                     case 4:
-                                        // TODO DateTime?
                                         {
                                             cell.setCurrentUserNumericValue();
-                                            break;
-                                        }
-                                    case 11:
-                                        {
-                                            // TODO DirectIncome is always calculated from NumericValueTotal
-                                            // Which is actually not correct but till that its fixed, update it like this / coni2k - 29 Nov. '15
-                                            // Also check "What a mess" of StringValue
-                                            if (cell.UserElementCellSet.length > 0) {
-                                                isUnchanged = cell.entityAspect.entityState.isUnchanged();
-                                                cell.NumericValueTotal = cell.UserElementCellSet[0].DecimalValue;
-                                                if (isUnchanged) { cell.entityAspect.acceptChanges(); }
-                                            }
-
-                                            cell.setCurrentUserNumericValue();
-                                            break;
-                                        }
-                                    case 12:
-                                        {
-                                            cell.ElementItem.setMultiplier();
-
-                                            if (cell.ElementField.IndexEnabled) {
-                                                cell.setNumericValueMultiplied();
-                                            }
-
                                             break;
                                         }
                                 }

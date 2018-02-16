@@ -50,15 +50,6 @@ export class User extends EntityBase {
         userName: ""
     };
 
-    getResourcePoolSetSorted(): any[] {
-        return this.ResourcePoolSet.sort((a: any, b: any) => {
-            let nameA = a.Name.toLowerCase(), nameB = b.Name.toLowerCase();
-            if (nameA < nameB) { return -1 };
-            if (nameA > nameB) { return 1 };
-            return 0;
-        });
-    }
-
     // Functions
     isAuthenticated() {
         return this.Id > 0;
