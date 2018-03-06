@@ -2,6 +2,7 @@
 import { EntityQuery, FetchStrategy, Predicate } from "breeze-client";
 import { Observable, ObservableInput } from "rxjs/Observable";
 
+import { Settings } from "../../settings/settings";
 import { Element } from "./entities/element";
 import { ElementCell } from "./entities/element-cell";
 import { ElementField } from "./entities/element-field";
@@ -17,13 +18,13 @@ import { Logger } from "../logger/logger.module";
 @Injectable()
 export class ResourcePoolService {
 
-    fetchedList: any[] = [];
+    fetchedEarlier = false;
 
     constructor(private dataService: DataService, private logger: Logger) {
 
         // Current user chanhaged
         this.dataService.currentUserChanged$.subscribe((newUser: any) => {
-            this.fetchedList = [];
+            this.fetchedEarlier = false;
         });
     }
 
@@ -104,37 +105,18 @@ export class ResourcePoolService {
         return userElementField;
     }
 
-    getResourcePoolExpanded(resourcePoolUniqueKey: any) {
-
-        // TODO Validations?
-
-        var fetchedEarlier = false;
-
-        // If it's not newly created, check the fetched list
-        fetchedEarlier = this.fetchedList.some((item: any) => (resourcePoolUniqueKey.username === item.username
-            && resourcePoolUniqueKey.resourcePoolKey === item.resourcePoolKey));
+    getResourcePoolExpanded() {
 
         // Prepare the query
-        var query = EntityQuery.from("Project");
-
-        // Is authorized? No, then get only the public data, yes, then get include user's own records
-        if (this.dataService.currentUser.isAuthenticated()) {
-            query = query.expand("User, ElementSet.ElementFieldSet.UserElementFieldSet, ElementSet.ElementItemSet.ElementCellSet.UserElementCellSet");
-        } else {
-            query = query.expand("User, ElementSet.ElementFieldSet, ElementSet.ElementItemSet.ElementCellSet");
-        }
-
-        var userNamePredicate = new Predicate("User.UserName", "eq", resourcePoolUniqueKey.username);
-        var resourcePoolKeyPredicate = new Predicate("Id", "eq", resourcePoolUniqueKey.resourcePoolKey);
-
-        query = query.where(userNamePredicate.and(resourcePoolKeyPredicate));
+        var query = EntityQuery.
+            from("Project")
+            .expand("ElementSet.ElementFieldSet, ElementSet.ElementItemSet.ElementCellSet")
+            .where("Id", "eq", Settings.projectId);
 
         // From server or local?
-        if (!fetchedEarlier) {
-            query = query.using(FetchStrategy.FromServer);
-        } else {
-            query = query.using(FetchStrategy.FromLocalCache);
-        }
+        query = this.fetchedEarlier
+            ? query.using(FetchStrategy.FromLocalCache)
+            : query.using(FetchStrategy.FromServer);
 
         return this.dataService.executeQuery(query)
             .map((response: any): any => {
@@ -147,16 +129,21 @@ export class ResourcePoolService {
                 // ResourcePool
                 var resourcePool = response.results[0];
 
+                // Initial value
                 resourcePool.InitialValue = 25000;
-                resourcePool.ElementSet[0].IsMainElement = true;
 
-                if (!fetchedEarlier) {
+                // Main element
+                resourcePool.ElementSet.forEach((element: Element) => {
+                    element.IsMainElement = element.Name === "Project";
+                });
+
+                if (!this.fetchedEarlier) {
 
                     // Init
                     resourcePool._init();
 
                     // Add the record into fetched list
-                    this.fetchedList.push(resourcePoolUniqueKey);
+                    this.fetchedEarlier = true;
                 }
 
                 return resourcePool;

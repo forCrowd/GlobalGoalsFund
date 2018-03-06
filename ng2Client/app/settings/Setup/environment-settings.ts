@@ -18,7 +18,12 @@
     static get enableProdMode(): boolean { return false; }
 
     /**
-     * Service application (WebApi) url
+     * Service application (Backbone WebAPI) url
      */
-    static get serviceAppUrl(): string { return "https://api.wealth.forcrowd.org"; }
+    static get serviceAppUrl(): string { return "https://api.backbone.forcrowd.org"; }
+
+    /**
+     * Service application (Backbone WebAPI) project ID: https://backbone.forcrowd.org/projects/9
+     */
+    static get projectId(): number { return 9 };
 }

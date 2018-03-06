@@ -14,7 +14,6 @@ import { Logger } from "../../modules/logger/logger.module";
 })
 export class GlobalGoalsComponent {
 
-    resourcePoolKey: any = { username: "forCrowd", resourcePoolKey: "7" };
     resourcePool: any = null;
     globalGoalElement: any = null;
 
@@ -23,7 +22,7 @@ export class GlobalGoalsComponent {
         private resourcePoolService: ResourcePoolService,
         private router: Router) {
 
-        this.resourcePool = this.resourcePoolService.getResourcePoolExpanded(this.resourcePoolKey)
+        this.resourcePool = this.resourcePoolService.getResourcePoolExpanded()
             .subscribe((resourcePool: any) => {
 
                 this.resourcePool = resourcePool;

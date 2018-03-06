@@ -7,7 +7,6 @@ export class ResourcePool extends EntityBase {
     Id = 0;
     UserId = 0;
     Name = "";
-    Key = "";
     InitialValue = 0;
     RatingCount = 0; // Computed value - Used in: resource-pool-editor.html
     User: any;
@@ -182,23 +181,7 @@ export class ResourcePool extends EntityBase {
                         // Cells
                         if (typeof field.ElementCellSet !== "undefined") {
                             field.ElementCellSet.forEach((cell: any) => {
-
                                 switch (cell.ElementField.DataType) {
-                                    case 1: {
-                                        // TODO Again what a mess!
-                                        // StringValue is a computed value, it should normally come from the server
-                                        // But in case resource pool was just created, then it should be directly set like this.
-                                        // Otherwise, it doesn't show its value on editor.
-                                        // And on top of it, since it changes, breeze thinks that "cell" is modified and tries to send it server
-                                        // which results an error. So that's why modified check & acceptChanges parts were added.
-                                        // coni2k - 01 Dec. '15
-                                        if (cell.UserElementCellSet.length > 0) {
-                                            isUnchanged = cell.entityAspect.entityState.isUnchanged();
-                                            cell.StringValue = cell.UserElementCellSet[0].StringValue;
-                                            if (isUnchanged) { cell.entityAspect.acceptChanges(); }
-                                        }
-                                        break;
-                                    }
                                     case 4:
                                         {
                                             cell.setCurrentUserNumericValue();

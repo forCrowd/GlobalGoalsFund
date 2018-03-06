@@ -13,7 +13,6 @@ import { Logger } from "../../modules/logger/logger.module";
 })
 export class DashboardComponent {
 
-    resourcePoolKey: any = { username: "forCrowd", resourcePoolKey: "7" };
     resourcePool: any = null;
 
     constructor(private dataService: DataService,
@@ -21,7 +20,7 @@ export class DashboardComponent {
         private resourcePoolService: ResourcePoolService,
         private router: Router) {
 
-        this.resourcePool = this.resourcePoolService.getResourcePoolExpanded(this.resourcePoolKey)
+        this.resourcePool = this.resourcePoolService.getResourcePoolExpanded()
             .subscribe((resourcePool: any) => {
                 this.resourcePool = resourcePool;
                 this.resourcePool.RatingMode = 2;

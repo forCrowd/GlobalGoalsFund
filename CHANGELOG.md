@@ -1,5 +1,9 @@
 ### Changelog
 
+**0.3.1**
+
+* ProjectId update
+
 **0.3.0**
 
 * Backbone migration

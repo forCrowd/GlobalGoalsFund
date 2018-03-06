@@ -20,12 +20,17 @@ export class Settings {
     static get enableProdMode(): boolean { return EnvironmentSettings.enableProdMode; }
 
     /**
-     * Service application (WebApi) url
+     * Service application (Backbone WebAPI) url
      */
     static get serviceAppUrl(): string { return EnvironmentSettings.serviceAppUrl; }
 
     /**
+     * Service application (Backbone WebAPI) project ID
+     */
+    static get projectId(): number { return 9 };
+
+    /**
      * Application version number
      */
-    static get version(): string { return "0.3.0"; }
+    static get version(): string { return "0.3.1"; }
 }

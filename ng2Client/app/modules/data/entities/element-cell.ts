@@ -8,7 +8,7 @@ export class ElementCell extends EntityBase {
     Id: number = 0;
     ElementFieldId: number = 0;
     ElementItemId: number = 0;
-    StringValue: string = ""; // Computed value - Used in: resource-pool-editor.html
+    StringValue: string = "";
     DecimalValueTotal: number = 0; // Computed value - Used in: setOtherUsersNumericValueTotal, setCurrentUserNumericValue
     DecimalValueCount: number = 0; // Computed value - Used in: setOtherUsersNumericValueCount
     SelectedElementItemId: any = null;

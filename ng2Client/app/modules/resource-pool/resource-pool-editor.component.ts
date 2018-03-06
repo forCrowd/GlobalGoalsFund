@@ -22,7 +22,6 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
         private router: Router) {
     }
 
-    @Input() config: any = { resourcePoolKey: "", username: "" };
     chartConfig: ChartConfig = null;
     currentUser: any = null;
     displayChart: boolean = false;
@@ -31,43 +30,31 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
     errorMessage: string = "";
     isSaving = false;
     resourcePool: any = null;
-    resourcePoolKey = "";
     saveStream = new Subject();
     subscriptions: any[] = [];
-    username = "";
 
     changeSelectedElement(element: any) {
         this.resourcePool.selectedElement(element);
         this.loadChartData();
     }
 
-    initialize(username: any, resourcePoolKey: any, user: any) {
+    initialize(user: any) {
 
         // If there is no change, no need to continue
-        if (this.username === username && this.resourcePoolKey === resourcePoolKey && this.currentUser === user) {
+        if (this.currentUser === user) {
             return;
         }
 
-        this.username = username;
-        this.resourcePoolKey = resourcePoolKey;
         this.currentUser = user;
 
         // Clear previous error messages
         this.errorMessage = "";
 
-        // Validate
-        if (this.username === "" || this.resourcePoolKey === "") {
-            this.errorMessage = "CMRP Id cannot be null";
-            return;
-        }
-
-        var resourcePoolUniqueKey = { username: this.username, resourcePoolKey: this.resourcePoolKey };
-
         // Get resource pool
-        this.resourcePoolService.getResourcePoolExpanded(resourcePoolUniqueKey)
+        this.resourcePoolService.getResourcePoolExpanded()
             .subscribe((resourcePool: any) => {
 
-                if (typeof resourcePool === "undefined" || resourcePool === null) {
+                if (!resourcePool) {
                     this.errorMessage = "Invalid CMRP";
                     return;
                 }
@@ -167,9 +154,6 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
 
     ngOnInit(): void {
 
-        var username = typeof this.config.username === "undefined" ? "" : this.config.username;
-        var resourcePoolKey = typeof this.config.resourcePoolKey === "undefined" ? "" : this.config.resourcePoolKey;
-
         // Delayed save operation
         this.saveStream.debounceTime(1500)
             .mergeMap(() => this.dataService.saveChanges()).subscribe();
@@ -177,13 +161,13 @@ export class ResourcePoolEditorComponent implements OnDestroy, OnInit {
         // Event handlers
         this.subscriptions.push(
             this.dataService.currentUserChanged$.subscribe((newUser: any) =>
-                this.initialize(this.username, this.resourcePoolKey, newUser)));
+                this.initialize(newUser)));
         this.subscriptions.push(
             this.dataService.saveChangesStarted$.subscribe(() => this.saveChangesStart()));
         this.subscriptions.push(
             this.dataService.saveChangesCompleted$.subscribe(() => this.saveChangesCompleted()));
 
-        this.initialize(username, resourcePoolKey, this.dataService.currentUser);
+        this.initialize(this.dataService.currentUser);
     }
 
     saveChangesStart() {

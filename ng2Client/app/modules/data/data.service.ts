@@ -73,42 +73,6 @@ export class DataService {
         return this.entityManager.getEntityByKey(entityType, entityKey);
     }
 
-    getUser(username: string) {
-
-        // Already fetched, then query locally
-        let alreadyFetched = this.fetchedUsers.indexOf(username) > -1;
-
-        let query = EntityQuery
-            .from("Users")
-            .expand("ProjectSet")
-            .where("UserName", "eq", username);
-
-        // From server or local?
-        if (alreadyFetched) {
-            query = query.using(FetchStrategy.FromLocalCache);
-        } else {
-            query = query.using(FetchStrategy.FromServer);
-        }
-
-        return this.executeQuery(query)
-            .map((response: any) => {
-
-                // If there is no result
-                if (response.results.length === 0) {
-                    return null;
-                }
-
-                var user = response.results[0];
-
-                // Add to fetched list
-                if (!alreadyFetched) {
-                    this.fetchedUsers.push(user.UserName);
-                }
-
-                return user;
-            });
-    }
-
     hasChanges() {
         return this.getChanges().length > 0;
         //return this.entityManager.hasChanges();
@@ -435,7 +399,7 @@ export class DataService {
             var username = token.userName;
             var query = EntityQuery
                 .from("Users")
-                .expand("ProjectSet")
+                .expand("UserElementFieldSet, UserElementCellSet")
                 .where("UserName", "eq", username)
                 .using(FetchStrategy.FromServer);
 
