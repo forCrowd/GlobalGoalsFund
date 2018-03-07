@@ -26,10 +26,6 @@
             "angular2-highcharts": "npm:angular2-highcharts/index",
             "highcharts": "npm:highcharts/highcharts.src",
 
-            // angular moment
-            "angular2-moment": "npm:angular2-moment/index",
-            "moment": "npm:moment/moment",
-
             // angular analytics
             "angulartics2": "npm:angulartics2/dist/index",
 

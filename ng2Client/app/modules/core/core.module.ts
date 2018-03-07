@@ -1,7 +1,6 @@
 ﻿import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { MomentModule } from "angular2-moment";
 
 import { NotFoundComponent } from "./not-found.component";
 
@@ -15,7 +14,6 @@ import { GlobalGoalsFundModule } from "../global-goals-fund/global-goals-fund.mo
     imports: [
         CommonModule,
         FormsModule,
-        MomentModule,
 
         CoreRouterModule,
         GlobalGoalsFundModule

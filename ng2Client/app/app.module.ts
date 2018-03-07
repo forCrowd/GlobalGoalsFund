@@ -5,7 +5,6 @@ import { FormsModule } from "@angular/forms";
 import { HttpModule } from "@angular/http";
 import { RouterModule } from "@angular/router";
 import { BrowserModule, Title } from "@angular/platform-browser";
-import { MomentModule } from "angular2-moment";
 
 import { AppComponent } from "./app.component";
 
@@ -31,7 +30,6 @@ import { ResourcePoolModule } from "./modules/resource-pool/resource-pool.module
         FormsModule,
         HttpModule,
         RouterModule,
-        MomentModule,
 
         // Internal
         AppErrorHandlerModule,

@@ -1,5 +1,9 @@
 ### Changelog
 
+**0.3.2**
+
+* moment.js removed
+
 **0.3.1**
 
 * ProjectId update
