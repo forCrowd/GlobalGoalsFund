@@ -22,7 +22,14 @@ export class DataService {
 
     currentUser: User = null;
     fetchedUsers: string[] = [];
-    restrictUserNames = ["app", "app.html", "app_offline.htm", "favicon.ico", "robots.txt", "web.config"]; // User cannot choose one of these folder/file names as its own username
+    restrictUserNames = ["app",
+        "app.html",
+        "app_offline.htm",
+        "_app_offline.htm",
+        "favicon.ico",
+        "robots.txt",
+        "web.config"
+    ]; // User cannot choose one of these folder/file names as its own username
     saveTimer: any = null;
 
     constructor(private entityManager: AppEntityManager,
@@ -399,7 +406,6 @@ export class DataService {
             var username = token.userName;
             var query = EntityQuery
                 .from("Users")
-                .expand("UserElementFieldSet, UserElementCellSet")
                 .where("UserName", "eq", username)
                 .using(FetchStrategy.FromServer);
 

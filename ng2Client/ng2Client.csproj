@@ -75,7 +75,7 @@
     <Content Include="app\modules\ng-chart\ng-chart.component.css" />
     <Content Include="app\modules\ng-chart\ng-chart.component.html" />
     <None Include="app\settings\setup\Readme.md" />
-    <None Include="app_offline.htm_" />
+    <Content Include="_app_offline.htm" />
     <Content Include="app\modules\resource-pool\resource-pool-editor.component.css" />
     <Content Include="app\modules\resource-pool\resource-pool-editor.component.html" />
     <Content Include="favicon.ico" />

@@ -1,5 +1,9 @@
 ### Changelog
 
+**0.3.3**
+
+* OData UserElementFieldSet, UserElementCellSet fix
+
 **0.3.2**
 
 * moment.js removed

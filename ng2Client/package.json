@@ -1,6 +1,6 @@
 {
     "name": "forcrowd-globalgoalsfund-ng2client",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Global solutions for global impact!",
     "main": "app.html",
     "scripts": {

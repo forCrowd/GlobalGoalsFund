@@ -108,10 +108,12 @@ export class ResourcePoolService {
     getResourcePoolExpanded() {
 
         // Prepare the query
-        var query = EntityQuery.
-            from("Project")
-            .expand("ElementSet.ElementFieldSet, ElementSet.ElementItemSet.ElementCellSet")
-            .where("Id", "eq", Settings.projectId);
+        let query = EntityQuery.from("Project").where("Id", "eq", Settings.projectId);
+
+        // Is authorized? No, then get only the public data, yes, then get include user's own records
+        query = this.dataService.currentUser.isAuthenticated()
+            ? query.expand("User, ElementSet.ElementFieldSet.UserElementFieldSet, ElementSet.ElementItemSet.ElementCellSet.UserElementCellSet")
+            : query.expand("User, ElementSet.ElementFieldSet, ElementSet.ElementItemSet.ElementCellSet");
 
         // From server or local?
         query = this.fetchedEarlier

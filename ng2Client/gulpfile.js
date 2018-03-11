@@ -304,7 +304,7 @@ function publish(config) {
             "./app/images/**/*",
             "./app/app.min.js",
             "./app/app.min.js.map",
-            "./app_offline.htm_",
+            "./_app_offline.htm",
             "./favicon.ico",
             "./robots.txt"
             ];
