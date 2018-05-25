@@ -1,5 +1,9 @@
 ### Changelog
 
+**0.3.3b**
+
+* Web.config - https redirect update
+
 **0.3.3**
 
 * OData UserElementFieldSet, UserElementCellSet fix
