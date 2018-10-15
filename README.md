@@ -9,7 +9,7 @@ Global solutions for global impact!
 Global Goals Fund is our project that we presented at United Nation's [Connect2Effect Hackathon](http://connect2effect.com).
 
 This prototype is specifically customized for the hackathon and we are not planning to develop it further at this moment.  
-You can reach to our original project here: [Wealth Economy](https://github.com/forCrowd/WealthEconomy)
+You can reach to our original project here: [Wealth Framework](https://github.com/forCrowd/WealthFramework)
 
 If you have any questions or would like to have more information, please feel free to contact us.
 

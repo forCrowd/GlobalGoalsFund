@@ -1,5 +1,9 @@
 ### Changelog
 
+**0.3.4**
+
+* Content updates
+
 **0.3.3b**
 
 * Web.config - https redirect update
