@@ -1,4 +1,4 @@
-# Global Goals Fund
+# Global Goals Fund [ARCHIVED]
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/forCrowd.svg?style=social)](https://twitter.com/forCrowd)
 
